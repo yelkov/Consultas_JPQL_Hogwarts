@@ -23,6 +23,10 @@ public class Main {
         Person dumbledore = consultas.getMaxgiver(em);
         System.out.println("\n"+dumbledore+"\n");
 
+        List<String> nombreProfesores = consultas.getNombresProfesores(em);
+        System.out.println("\nPROFESORES:");
+        nombreProfesores.forEach(System.out::println);
+
 
         em.close();
         emf.close();

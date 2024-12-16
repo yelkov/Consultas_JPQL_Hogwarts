@@ -45,6 +45,22 @@ public class Consultas {
         return maxGiver;
     }
 
+    public List<String> getNombresProfesores(EntityManager em) {
+        List<String> nombresProfesores = new ArrayList<>();
+        try{
+            Query query = em.createNativeQuery("""
+                                                    select  p.first_name
+                                                        from person as p inner join course as c
+                                                                            on p.id = c.teacher_id
+                                                    """);
+            nombresProfesores.addAll(query.getResultList());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return nombresProfesores;
+    }
+
 
 
 }
