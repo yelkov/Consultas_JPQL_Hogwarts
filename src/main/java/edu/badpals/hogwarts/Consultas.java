@@ -61,6 +61,71 @@ public class Consultas {
         return nombresProfesores;
     }
 
+    public List<String> getNombresCursoProfesor(EntityManager em){
+        List<String> nombresCursoProfesores = new ArrayList<>();
+        try{
+            Query query = em.createNativeQuery("""
+                                                    select c.name, p.first_name, p.last_name
+                                                        from course as c left join person as p
+                                                                        on c.teacher_id = p.id
+                                                    """);
+            List<Object[]> resultados = query.getResultList();
+            for(Object[] row : resultados){
+                StringBuilder sb = new StringBuilder();
+                sb.append((String)row[0]);
+                sb.append(": ");
+                sb.append(row[1] == null ? " - " : (String) row[1]);
+                sb.append(" ");
+                sb.append(row[2] == null ? " - " : (String) row[2]);
+                nombresCursoProfesores.add(sb.toString());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return nombresCursoProfesores;
+    }
+
+    public List<String> getNomPersonasPtosSobreMedia(EntityManager em){
+        List<String> nomPersonasPtosSobreMedia = new ArrayList<>();
+        try{
+            Query query = em.createNativeQuery("""
+                                                select p.first_name, p.last_name
+                                                        from house_points as hp inner join person as p
+                                                                            on hp.receiver = p.id
+                                                        group by hp.receiver
+                                                        having sum(hp.points) > (
+                                                                                    select avg(points)
+                                                                                        from house_points
+                                                                                )
+                                                    """);
+            List<Object[]> resultados = query.getResultList();
+            for(Object[] row : resultados){
+                StringBuilder sb = new StringBuilder();
+                sb.append((String)row[0]);
+                sb.append(" ");
+                sb.append((String)row[1]);
+                nomPersonasPtosSobreMedia.add(sb.toString());
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return nomPersonasPtosSobreMedia;
+    }
+
+    public int deletePersona(EntityManager em, Person person) {
+        int instanciasEliminadas = 0;
+        try{
+            em.getTransaction().begin();
+            Query query = em.createQuery("DELETE FROM Person p WHERE p = :persona");
+            query.setParameter("persona", person);
+            instanciasEliminadas = query.executeUpdate();
+            em.getTransaction().commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return instanciasEliminadas;
+    }
 
 
 }
